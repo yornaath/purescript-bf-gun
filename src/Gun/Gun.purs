@@ -1,7 +1,7 @@
 module Gun (
   GunNode(..),
   Response(..),
-  GunCursor(..),
+  RawNode(..),
   create,
   opt,
   get,
@@ -25,10 +25,10 @@ import Effect.Aff (Aff)
 data GunNode a
   = GunNode a
 
-type GunCursor a = {}
+type RawNode a = {}
 
 type Response a
-  = { data :: Either JsonDecodeError a, key :: String, cursor :: GunCursor a }
+  = { data :: Either JsonDecodeError a, key :: String, raw :: RawNode a }
 
 foreign import _create :: forall a. Options Configuration -> GunNode a
 

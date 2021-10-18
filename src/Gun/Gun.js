@@ -19,7 +19,7 @@ exports._on = (cb) => (gun) => () => gun.on((data, key) => {
   const out = {
     key,
     data: gun.jsonDecode(omit(data, ['_'])),
-    cursor: data._
+    raw: data._
   }
   cb(out)
 })
@@ -28,7 +28,7 @@ exports._once = (cb) => (gun) => () => gun.once((data, key) => {
   const out = {
     key,
     data: gun.jsonDecode(omit(data, ['_'])),
-    cursor: data._
+    raw: data._
   }
   cb(out)
 })
@@ -37,7 +37,7 @@ exports._map = (cb) => (gun) => () => gun.map((data, key) => {
   const out = {
     key,
     data: gun.jsonDecode(omit(data, ['_'])),
-    cursor: data._
+    raw: data._
   }
   cb(out)
 })
