@@ -2,7 +2,10 @@
 const Gun = require('gun')
 const omit = require('lodash.omit')
 
-exports._create = (opts) => new Gun(opts)
+exports._create = (opts) => {
+  console.log("JS.debug", {create: opts})
+  return new Gun(opts)
+}
 
 exports._opt = (opts) => (gun) => gun.opt(opts)
 
@@ -14,6 +17,10 @@ exports._get = (decode) => (encode) => (key) => (gun) => {
 }
 
 exports._put = (data) => (gun) => gun.put(gun.jsonEncode(data))
+
+// foreign import _putWithCertificate :: forall a. Certificate -> a -> GunNode a -> GunNode a
+
+exports._putWithCertificate = (cert) => (data) => (gun) => gun.put(gun.jsonEncode(data), null, {opt: { cert }})
 
 exports._on = (cb) => (gun) => () => gun.on((data, key) => {
   const out = {

@@ -6,6 +6,7 @@ module Gun (
   opt,
   get,
   put,
+  putWithCertificate,
   on,
   once,
   map,
@@ -14,13 +15,16 @@ module Gun (
 ) where
 
 import Prelude
+
 import Control.Promise (Promise, toAffE)
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, JsonDecodeError)
 import Data.Either (Either)
 import Data.Gun.Configuration (Configuration)
-import Data.Options (Options)
+import Data.Options (Options, options)
 import Effect (Effect)
 import Effect.Aff (Aff)
+import Foreign (Foreign)
+import Gun.SEA (Certificate)
 
 data GunNode a
   = GunNode a
@@ -30,10 +34,10 @@ type RawNode a = {}
 type Response a
   = { data :: Either JsonDecodeError a, key :: String, raw :: RawNode a }
 
-foreign import _create :: forall a. Options Configuration -> GunNode a
+foreign import _create :: forall a. Foreign -> GunNode a
 
 create :: forall a. Options Configuration -> GunNode a
-create = _create
+create opts = _create (options opts)
 
 foreign import _opt :: forall a. Options Configuration -> GunNode a -> GunNode a
 
@@ -49,6 +53,11 @@ foreign import _put :: forall a. a -> GunNode a -> GunNode a
 
 put :: forall a. a -> GunNode a -> GunNode a
 put = _put
+
+foreign import _putWithCertificate :: forall a. Certificate -> a -> GunNode a -> GunNode a
+
+putWithCertificate :: forall a. Certificate -> a -> GunNode a -> GunNode a
+putWithCertificate = _putWithCertificate
 
 foreign import _on :: forall a. (Response a -> Effect Unit) -> GunNode a -> Effect Unit
 

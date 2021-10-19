@@ -9,11 +9,14 @@ import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
 import Effect (Effect)
+import Effect.Aff (launchAff, launchAff_)
+import Effect.Aff.Class (liftAff)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (logShow)
 import Effect.Console (log)
 import Effect.Timer (setInterval, setTimeout)
 import Gun (GunNode, create, get, on, put)
+import Gun.SEA (algoOption, pBKDF2, pair, sHA256, secret, work)
 
 type State = { inc :: Int, state :: String }
 
@@ -28,23 +31,36 @@ stateFromJson :: Json -> Either JsonDecodeError State
 stateFromJson = decodeJson
 
 main :: Effect Unit
-main = do
+main = launchAff_ do
 
   let 
     gunConfig :: Options Configuration
     gunConfig = webOption := Nothing <>
-                fileOption := Nothing
+                fileOption := Just "radata"
 
   let gun = (create gunConfig) :: GunNode State
 
-  let statenode = gun # get stateFromJson stateToJson "state"
-  
-  _ <- do
-    statenode # on \d -> do pure $ trace d identity
+  pairA <- pair
+  pairB <- pair
 
-  _ <- setInterval 3000 do
-    log "timer"
-    let _ = statenode # put { inc: 1, state: "newstate" }
-    pure unit
+  secret' <- secret pairA pairB
+
+  pure $ trace {secret'} identity
+
+  -- pure $ trace {pair'} identity
+
+  -- out <- work pair' {foobar: "foos"} (algoOption := Just sHA256)
+
+  -- pure $ trace {out} identity
+
+  -- let statenode = gun # get stateFromJson stateToJson "state"
+  
+  -- _ <- do
+  --   liftEffect $ statenode # on \d -> do pure $ trace d identity
+
+  -- _ <- liftEffect $ setInterval 3000 do
+  --   log "timer"
+  --   let _ = statenode # put { inc: 1, state: "newstate" }
+  --   pure unit
 
   pure unit
