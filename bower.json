@@ -1,7 +1,7 @@
 {
   "name": "purescript-purescript-bf-gun",
   "license": [
-    "GNU GPL"
+    "(GPL-3.0-only OR MIT)"
   ],
   "repository": {
     "type": "git",

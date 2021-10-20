@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "GNU GPL",
+  "license": "(GPL-3.0-only OR MIT)",
   "dependencies": {
     "gun": "^0.2020.1235",
     "lodash.omit": "^4.5.0"
