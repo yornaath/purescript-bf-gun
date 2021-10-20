@@ -3,7 +3,6 @@ const Gun = require('gun')
 const omit = require('lodash.omit')
 
 exports._create = (opts) => () => {
-  console.log("JS.debug", {create: opts})
   return new Gun(opts)
 }
 
@@ -50,33 +49,3 @@ exports._map = (cb) => (gun) => () => gun.map((data, key) => {
 exports._back = (steps) => (gun) => () => gun.back(steps)
 
 exports._off = (gun) => () => gun.off()
-
-exports._user = (gun) => () => gun.user()
-
-exports._auth = (onError) => (onSuccess) => (alias) => (pass) => (usernode) => () => new Promise((resolve) => {
-  usernode.auth(alias, pass, (data) => {
-    if(data.err) {
-      resolve(onError(data))
-    }
-    else {
-      resolve(onSuccess(data))
-    }
-  })
-})
-
-exports._createUser = (onError) => (onSuccess) => (alias) => (pass) => (usernode) => () => new Promise((resolve) => {
-  usernode.create(alias, pass, (data) => {
-    if(data.err) {
-      resolve(onError(data))
-    }
-    else {
-      resolve(onSuccess(data))
-    }
-  })
-})
-
-// exports.notImpl = (gun) => {
-//   return new Promise((resolve, reject) => {
-//     gun.not ? gun.not((key) => resolve({ key })) : reject(new Error("Not included by default! You must include it yourself via `require('gun/lib/not.js')"))
-//   })
-// }
