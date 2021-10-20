@@ -1,5 +1,10 @@
+const Gun = require("gun")
 
-const omitSingle = (key, { [key]: _, ...obj }) => obj
+const omitSingle = (key, obj) => {
+  const out = obj
+  delete out[key]
+  return out
+}
 
 exports._create = (opts) => () => {
   return new Gun(opts)
@@ -21,8 +26,8 @@ exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(gun.jso
 exports._on = (cb) => (gun) => () => gun.on((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omitSingle("_", data)),
-    raw: data._
+    raw: data._,
+    data: gun.jsonDecode(omitSingle("_", data))
   }
   cb(out)
 })
@@ -30,8 +35,8 @@ exports._on = (cb) => (gun) => () => gun.on((data, key) => {
 exports._once = (cb) => (gun) => () => gun.once((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omitSingle("_", data)),
-    raw: data._
+    raw: data._,
+    data: gun.jsonDecode(omitSingle("_", data))
   }
   cb(out)
 })
@@ -39,8 +44,8 @@ exports._once = (cb) => (gun) => () => gun.once((data, key) => {
 exports._map = (cb) => (gun) => () => gun.map((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omitSingle("_", data)),
-    raw: data._
+    raw: data._,
+    data: gun.jsonDecode(omitSingle("_", data))
   }
   cb(out)
 })

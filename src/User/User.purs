@@ -4,7 +4,7 @@ import Prelude
 import Control.Promise (Promise, toAffE)
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Gun.Node (Node(..))
+import Gun.Node (Node)
 
 data CreateAck
   = CreatedSuccess CreatedSuccessPayload
