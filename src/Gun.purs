@@ -16,7 +16,7 @@ module Gun
 import Prelude
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, JsonDecodeError)
 import Data.Either (Either)
-import Data.Gun.Configuration (Configuration)
+import Gun.Configuration (Configuration)
 import Data.Options (Options, options)
 import Effect (Effect)
 import Foreign (Foreign)
