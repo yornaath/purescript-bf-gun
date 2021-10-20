@@ -10,3 +10,5 @@
 /.spago
 radata
 .secrets
+.parcel-cache
+dist

@@ -4,12 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "example-basic": "concurrently --kill-others \"node ./examples/basic/server.js\" \"parcel examples/basic/index.html\""
   },
   "author": "",
   "license": "(GPL-3.0-only OR MIT)",
   "dependencies": {
     "gun": "^0.2020.1235",
     "lodash.omit": "^4.5.0"
+  },
+  "devDependencies": {
+    "concurrently": "^6.3.0",
+    "express": "^4.17.1",
+    "parcel": "^2.0.0"
   }
 }

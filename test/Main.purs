@@ -3,7 +3,7 @@ module Test.Main where
 import Prelude
 import Data.Argonaut (Json, JsonDecodeError, decodeJson, encodeJson)
 import Data.Either (Either)
-import Data.Gun.Configuration (Configuration, fileOption, webOption)
+import Gun.Configuration (Configuration, fileOption, webOption)
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)

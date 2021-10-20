@@ -56,19 +56,19 @@ putWithCertificate = _putWithCertificate
 type ListenerResponse a
   = { data :: Either JsonDecodeError a, key :: String, raw :: RawNode a }
 
-foreign import _on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+foreign import _on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 
-on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 on = _on
 
-foreign import _once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+foreign import _once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 
-once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 once = _once
 
-foreign import _map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+foreign import _map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 
-map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect Unit
+map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
 map = _map
 
 foreign import _back :: forall a. Int -> Node a -> Effect (Node a)
