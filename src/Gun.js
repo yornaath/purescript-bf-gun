@@ -1,6 +1,5 @@
 
-const Gun = require('gun')
-const omit = require('lodash.omit')
+const omitSingle = (key, { [key]: _, ...obj }) => obj
 
 exports._create = (opts) => () => {
   return new Gun(opts)
@@ -22,7 +21,7 @@ exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(gun.jso
 exports._on = (cb) => (gun) => () => gun.on((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omit(data, ['_'])),
+    data: gun.jsonDecode(omitSingle("_", data)),
     raw: data._
   }
   cb(out)
@@ -31,7 +30,7 @@ exports._on = (cb) => (gun) => () => gun.on((data, key) => {
 exports._once = (cb) => (gun) => () => gun.once((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omit(data, ['_'])),
+    data: gun.jsonDecode(omitSingle("_", data)),
     raw: data._
   }
   cb(out)
@@ -40,7 +39,7 @@ exports._once = (cb) => (gun) => () => gun.once((data, key) => {
 exports._map = (cb) => (gun) => () => gun.map((data, key) => {
   const out = {
     key,
-    data: gun.jsonDecode(omit(data, ['_'])),
+    data: gun.jsonDecode(omitSingle("_", data)),
     raw: data._
   }
   cb(out)
