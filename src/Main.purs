@@ -9,26 +9,27 @@ import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
 import Effect (Effect)
-import Effect.Aff (launchAff, launchAff_)
-import Effect.Aff.Class (liftAff)
+import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
-import Effect.Class.Console (logShow)
-import Effect.Console (log)
-import Effect.Timer (setInterval, setTimeout)
-import Gun (GunNode, create, get, on, put)
-import Gun.SEA (algoOption, pBKDF2, pair, sHA256, secret, work)
+import Effect.Timer (setInterval)
+import Foreign (Foreign)
+import Gun (AuthAck(..), Node(..), auth, create, createUser, get, on, put, user)
 
-type State = { inc :: Int, state :: String }
-
--- We get encoding and decoding for free because of the `EncodeJson` instances
--- for records, strings, integers, and `Maybe`, along with many other common
--- PureScript types.
+type State = { state :: String }
 
 stateToJson :: State -> Json
 stateToJson = encodeJson
 
 stateFromJson :: Json -> Either JsonDecodeError State
 stateFromJson = decodeJson
+
+type UserData = {secret :: String}
+
+userDataToJson :: UserData -> Json
+userDataToJson = encodeJson
+
+userDataFromJson :: Json -> Either JsonDecodeError UserData
+userDataFromJson = decodeJson
 
 main :: Effect Unit
 main = launchAff_ do
@@ -38,14 +39,48 @@ main = launchAff_ do
     gunConfig = webOption := Nothing <>
                 fileOption := Just "radata"
 
-  let gun = (create gunConfig) :: GunNode State
+  gun <- liftEffect $ (create gunConfig)
 
-  pairA <- pair
-  pairB <- pair
+  -- pairA <- SEA.pair
+  -- pairB <- SEA.pair
 
-  secret' <- secret pairA pairB
+  -- secret' <- SEA.secret pairA pairB
 
-  pure $ trace {secret'} identity
+  statenode <- liftEffect $ get stateFromJson stateToJson "state" gun
+
+  _ <- do
+    liftEffect $ statenode # on \d -> do pure $ trace { stateNode: d} identity
+
+  _ <- liftEffect $ setInterval 3000 do
+    _ <- statenode # put { state: "new" }
+    pure unit
+
+  usernode <- liftEffect $ user gun
+  
+
+  bob <- createUser "bob" "bobspass" usernode
+  
+  authed <- auth "bob" "bobspass" usernode
+
+  case authed of 
+    (AuthSuccess auth) -> do
+      
+      pure $ trace "logged in" identity
+
+      userDataNode <- liftEffect $ get userDataFromJson userDataToJson "data" usernode
+
+      _ <- do
+        liftEffect $ userDataNode # on \d -> do pure $ trace { userNode: d} identity
+
+      _ <- liftEffect $ setInterval 3000 do
+        _ <- userDataNode # put { secret : "Hysjaass" }
+        pure unit
+
+      pure $ trace "exit" identity
+
+    (AuthError {err}) -> do
+      pure $ trace err identity
+  
 
   -- pure $ trace {pair'} identity
 

@@ -2,25 +2,23 @@
 const Gun = require('gun')
 const omit = require('lodash.omit')
 
-exports._create = (opts) => {
+exports._create = (opts) => () => {
   console.log("JS.debug", {create: opts})
   return new Gun(opts)
 }
 
-exports._opt = (opts) => (gun) => gun.opt(opts)
+exports._opt = (opts) => (gun) => () => gun.opt(opts)
 
-exports._get = (decode) => (encode) => (key) => (gun) => {
+exports._get = (decode) => (encode) => (key) => (gun) => () => {
   const node = gun.get(key)
   node.jsonDecode = decode
   node.jsonEncode = encode
   return node
 }
 
-exports._put = (data) => (gun) => gun.put(gun.jsonEncode(data))
+exports._put = (data) => (gun) => () => gun.put(gun.jsonEncode(data))
 
-// foreign import _putWithCertificate :: forall a. Certificate -> a -> GunNode a -> GunNode a
-
-exports._putWithCertificate = (cert) => (data) => (gun) => gun.put(gun.jsonEncode(data), null, {opt: { cert }})
+exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(gun.jsonEncode(data), null, {opt: { cert }})
 
 exports._on = (cb) => (gun) => () => gun.on((data, key) => {
   const out = {
@@ -49,10 +47,33 @@ exports._map = (cb) => (gun) => () => gun.map((data, key) => {
   cb(out)
 })
 
-
-exports._back = (steps) => (gun) => gun.back(steps)
+exports._back = (steps) => (gun) => () => gun.back(steps)
 
 exports._off = (gun) => () => gun.off()
+
+exports._user = (gun) => () => gun.user()
+
+exports._auth = (onError) => (onSuccess) => (alias) => (pass) => (usernode) => () => new Promise((resolve) => {
+  usernode.auth(alias, pass, (data) => {
+    if(data.err) {
+      resolve(onError(data))
+    }
+    else {
+      resolve(onSuccess(data))
+    }
+  })
+})
+
+exports._createUser = (onError) => (onSuccess) => (alias) => (pass) => (usernode) => () => new Promise((resolve) => {
+  usernode.create(alias, pass, (data) => {
+    if(data.err) {
+      resolve(onError(data))
+    }
+    else {
+      resolve(onSuccess(data))
+    }
+  })
+})
 
 // exports.notImpl = (gun) => {
 //   return new Promise((resolve, reject) => {

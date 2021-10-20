@@ -27,7 +27,6 @@ module Gun.SEA (
 import Prelude
 
 import Control.Promise (Promise, toAffE)
-import Data.Gun.Configuration (Configuration)
 import Data.Maybe (Maybe)
 import Data.Options (Option, Options, opt, optional, options)
 import Effect (Effect)
@@ -124,9 +123,7 @@ foreign import _secret :: KeyPair -> KeyPair -> Effect (Promise String)
 secret :: KeyPair -> KeyPair -> Aff String
 secret pairA pairB = toAffE $ _secret pairA pairB
 
--- exports._certify = (publicKey) => (paths) => (pair) => () => SEA.certify(publicKey, paths, pair)
-
 foreign import _certify :: String -> Array String -> KeyPair -> Effect (Promise Certificate)
 
 certify :: String -> Array String -> KeyPair -> Aff Certificate
-certify pub paths pair = toAffE $ _certify pub paths pair
+certify pub paths pair' = toAffE $ _certify pub paths pair'
