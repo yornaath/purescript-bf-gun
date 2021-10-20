@@ -1,4 +1,19 @@
-module Gun.User where
+module Gun.User
+  ( CreateAck(..)
+  , AuthAck(..)
+  , AuthSuccessPayload
+  , CreatedSuccessPayload
+  , CreatedErrorPayload
+  , AuthErrorPayload
+  , DeleteSuccessPayload
+  , user
+  , userAt
+  , createUser
+  , auth
+  , recall
+  , leave
+  , delete
+  ) where
 
 import Prelude
 import Control.Promise (Promise, toAffE)
