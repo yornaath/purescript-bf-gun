@@ -4,6 +4,7 @@ module Gun
   , opt
   , get
   , put
+  , set
   , putWithCertificate
   , on
   , once
@@ -41,6 +42,11 @@ foreign import _put :: forall a. a -> Node a -> Effect (Node a)
 
 put :: forall a. a -> Node a -> Effect (Node a)
 put = _put
+
+foreign import _set :: forall a. a -> Node a -> Effect (Node a)
+
+set :: forall a. a -> Node a -> Effect (Node a)
+set = _set
 
 foreign import _putWithCertificate :: forall a. Certificate -> a -> Node a -> Effect (Node a)
 

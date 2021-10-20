@@ -21,6 +21,8 @@ exports._get = (decode) => (encode) => (key) => (gun) => () => {
 
 exports._put = (data) => (gun) => () => gun.put(gun.jsonEncode(data))
 
+exports._set = (data) => (gun) => () => gun.set(gun.jsonEncode(data))
+
 exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(gun.jsonEncode(data), null, {opt: { cert }})
 
 exports._on = (cb) => (gun) => () => gun.on((data, key) => {

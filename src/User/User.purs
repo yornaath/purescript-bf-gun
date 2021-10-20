@@ -26,10 +26,18 @@ type CreatedErrorPayload
 type AuthErrorPayload
   = { err :: String }
 
+type DeleteSuccessPayload
+  = { ok :: Int }
+
 foreign import _user :: forall a. Node a -> Effect (Node a)
 
 user :: forall a. Node a -> Effect (Node a)
 user = _user
+
+foreign import _userAt :: forall a. String -> Node a -> Effect (Node a)
+
+userAt :: forall a. String -> Node a -> Effect (Node a)
+userAt = _userAt
 
 foreign import _createUser :: forall a. (CreatedErrorPayload -> CreateAck) -> (CreatedSuccessPayload -> CreateAck) -> String -> String -> Node a -> Effect (Promise CreateAck)
 
@@ -40,3 +48,18 @@ foreign import _auth :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessP
 
 auth :: forall a. String -> String -> Node a -> Aff AuthAck
 auth alias pass node = toAffE $ _auth AuthError AuthSuccess alias pass node
+
+foreign import _recall :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> Node a -> Effect (Promise AuthAck)
+
+recall :: forall a. Node a -> Aff AuthAck
+recall node = toAffE $ _recall AuthError AuthSuccess node
+
+foreign import _leave :: forall a. Node a -> Effect (Node a)
+
+leave :: forall a. Node a -> Effect (Node a)
+leave = _leave
+
+foreign import _delete :: forall a. String -> String -> Node a -> Effect (Promise DeleteSuccessPayload)
+
+delete :: forall a. String -> String -> Node a -> Aff DeleteSuccessPayload
+delete alias pass node = toAffE $ _delete alias pass node
