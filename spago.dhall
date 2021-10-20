@@ -25,6 +25,6 @@ to generate this file without the comments in this block.
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ] 
-, license = "GPL-2.0-or-later"
+, license = "MIT"
 , repository = "https://github.com/gorillatron/purescript-bf-gun.git"
 }
