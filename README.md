@@ -1,6 +1,13 @@
 # purescript-bf-gun
 
-Gun DB in purescript.
+Gun DB bindings in purescript.
+
+## Docs
+[pursuit.purescript.org/packages/purescript-bf-gun](https://pursuit.purescript.org/packages/purescript-bf-gun)
+
+## Quickstart
+
+A simple quickstart with shared state type between client and express server.
 
 ### Server
 ```purescript
