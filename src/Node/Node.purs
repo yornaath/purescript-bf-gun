@@ -1,4 +1,4 @@
-module Gun.Node where 
+module Gun.Node where
 
 data Node a
   = Node a

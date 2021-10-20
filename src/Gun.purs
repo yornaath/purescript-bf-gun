@@ -13,18 +13,15 @@ module Gun
   ) where
 
 import Prelude
-import Control.Promise (Promise, toAffE)
 import Data.Argonaut (class DecodeJson, class EncodeJson, Json, JsonDecodeError)
 import Data.Either (Either)
 import Data.Gun.Configuration (Configuration)
 import Data.Options (Options, options)
 import Effect (Effect)
-import Effect.Aff (Aff)
 import Foreign (Foreign)
 import Gun.SEA (Certificate)
 import Gun.Node (Node, RawNode)
 
--- Gun
 foreign import _create :: forall a. Foreign -> Effect (Node a)
 
 create :: forall a. Options Configuration -> Effect (Node a)

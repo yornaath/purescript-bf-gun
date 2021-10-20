@@ -1,31 +1,30 @@
-module Gun.SEA (
-  KeyPair,
-  work,
-  pair,
-  sign,
-  verify,
-  encrypt,
-  decrypt,
-  secret,
-  certify,
-  AlgoType(..),
-  Encoding(..),
-  Certificate(..),
-  sHA256,
-  pBKDF2,
-  base64,
-  base32,
-  base16,
-  WorkOptions(..),
-  algoOption,
-  encodingOption,
-  iterationsOptions,
-  saltOptions,
-  hashOptions
-) where
+module Gun.SEA
+  ( KeyPair
+  , work
+  , pair
+  , sign
+  , verify
+  , encrypt
+  , decrypt
+  , secret
+  , certify
+  , AlgoType(..)
+  , Encoding(..)
+  , Certificate(..)
+  , sHA256
+  , pBKDF2
+  , base64
+  , base32
+  , base16
+  , WorkOptions(..)
+  , algoOption
+  , encodingOption
+  , iterationsOptions
+  , saltOptions
+  , hashOptions
+  ) where
 
 import Prelude
-
 import Control.Promise (Promise, toAffE)
 import Data.Maybe (Maybe)
 import Data.Options (Option, Options, opt, optional, options)
@@ -33,42 +32,47 @@ import Effect (Effect)
 import Effect.Aff (Aff)
 import Foreign (Foreign)
 
-type KeyPair = {
-  pub :: String,
-  priv :: String,
-  epub :: String,
-  epriv :: String
-}
+type KeyPair
+  = { pub :: String
+    , priv :: String
+    , epub :: String
+    , epriv :: String
+    }
 
-type AsymetricKeyPair = {
-  pub :: String,
-  priv :: String
-}
+type AsymetricKeyPair
+  = { pub :: String
+    , priv :: String
+    }
 
-type PubKey = {
-  pub :: String
-}
+type PubKey
+  = { pub :: String
+    }
 
-type EPriv = {
-  epriv :: String
-}
+type EPriv
+  = { epriv :: String
+    }
 
-type Certificate = {
-  m :: {
-    c :: String,
-    w :: Array String
-  }
-}
+type Certificate
+  = { m ::
+        { c :: String
+        , w :: Array String
+        }
+    }
 
-newtype AlgoType = AlgoType String
+newtype AlgoType
+  = AlgoType String
 
-newtype Encoding = Encoding String
+newtype Encoding
+  = Encoding String
 
 sHA256 = AlgoType "SHA-256" :: AlgoType
+
 pBKDF2 = AlgoType "PBKDF2" :: AlgoType
 
 base64 = Encoding "base64" :: Encoding
+
 base32 = Encoding "base32" :: Encoding
+
 base16 = Encoding "base16" :: Encoding
 
 foreign import data WorkOptions :: Type
