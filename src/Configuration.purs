@@ -1,4 +1,4 @@
-module Data.Gun.Configuration where
+module Gun.Configuration where
 
 
 import Data.Maybe (Maybe)
