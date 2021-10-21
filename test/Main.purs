@@ -45,7 +45,7 @@ main =
 
     gun <- liftEffect $ (create gunConfig)
 
-    statenode <- liftEffect $ get rootDataFromJson rootDataToJson "state" gun
+    statenode <- liftEffect $ get "state" gun
 
     _ <- do
       liftEffect $ statenode # on \d -> do pure $ trace { stateNode: d } identity
@@ -65,7 +65,7 @@ main =
       (User.AuthSuccess auth) -> do
 
         pure $ trace "logged in" identity
-        userDataNode <- liftEffect $ get userDataFromJson userDataToJson "data" usernode
+        userDataNode <- liftEffect $ get "data" usernode
 
         _ <- do
           liftEffect $ userDataNode # on \d -> do pure $ trace { userNode: d } identity

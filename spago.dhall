@@ -13,6 +13,7 @@ to generate this file without the comments in this block.
 { name = "bf-gun"
 , dependencies =
   [ "aff"
+  , "aff-coroutines"
   , "aff-promise"
   , "argonaut"
   , "console"
@@ -20,6 +21,7 @@ to generate this file without the comments in this block.
   , "effect"
   , "express"
   , "foreign-generic"
+  , "halogen"
   , "node-http"
   , "options"
   , "prelude"
@@ -27,7 +29,7 @@ to generate this file without the comments in this block.
   , "test-unit"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, sources = [ "src/**/*.purs", "test/**/*.purs", "examples/**/*.purs" ]
 , license = "(GPL-3.0-only OR MIT)"
 , repository = "https://github.com/gorillatron/purescript-bf-gun.git"
 }

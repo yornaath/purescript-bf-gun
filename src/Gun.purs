@@ -1,6 +1,5 @@
 module Gun
-  ( ListenerResponse(..)
-  , create
+  ( create
   , opt
   , get
   , put
@@ -14,14 +13,14 @@ module Gun
   ) where
 
 import Prelude
-import Data.Argonaut (class DecodeJson, class EncodeJson, Json, JsonDecodeError)
-import Data.Either (Either)
-import Gun.Configuration (Configuration)
+
+import Data.Argonaut (Json)
 import Data.Options (Options, options)
 import Effect (Effect)
 import Foreign (Foreign)
+import Gun.Configuration (Configuration)
+import Gun.Node (Node, Raw)
 import Gun.SEA (Certificate)
-import Gun.Node (Node, RawNode)
 
 foreign import _create :: forall a. Foreign -> Effect (Node a)
 
@@ -33,9 +32,9 @@ foreign import _opt :: forall a. Options Configuration -> Node a -> Effect (Node
 opt :: forall a. Options Configuration -> Node a -> Effect (Node a)
 opt = _opt
 
-foreign import _get :: forall a b. ((Json -> Either JsonDecodeError b)) -> (b -> Json) -> String -> Node a -> Effect (Node b)
+foreign import _get :: forall a b. String -> Node a -> Effect (Node b)
 
-get :: forall a b. EncodeJson b => DecodeJson b => ((Json -> Either JsonDecodeError b)) -> (b -> Json) -> String -> Node a -> Effect (Node b)
+get :: forall a b. String -> Node a -> Effect (Node b)
 get = _get
 
 foreign import _put :: forall a. a -> Node a -> Effect (Node a)
@@ -45,7 +44,7 @@ put = _put
 
 foreign import _set :: forall a. a -> Node a -> Effect (Node a)
 
-set :: forall a. a -> Node a -> Effect (Node a)
+set :: forall a. a -> Node a -> Effect (Node a) 
 set = _set
 
 foreign import _putWithCertificate :: forall a. Certificate -> a -> Node a -> Effect (Node a)
@@ -53,22 +52,19 @@ foreign import _putWithCertificate :: forall a. Certificate -> a -> Node a -> Ef
 putWithCertificate :: forall a. Certificate -> a -> Node a -> Effect (Node a)
 putWithCertificate = _putWithCertificate
 
-type ListenerResponse a
-  = { data :: Either JsonDecodeError a, key :: String, raw :: RawNode a }
+foreign import _on :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 
-foreign import _on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
-
-on :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
+on :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 on = _on
 
-foreign import _once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
+foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 
-once :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
+once :: forall a. (Raw a  -> Effect Unit) -> Node a -> Effect (Node a)
 once = _once
 
-foreign import _map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
+foreign import _map :: forall a b. (Raw a  -> b) -> Node a -> Effect (Node b)
 
-map :: forall a. (ListenerResponse a -> Effect Unit) -> Node a -> Effect (Node a)
+map :: forall a b. (Raw a -> b) -> Node a -> Effect (Node b)
 map = _map
 
 foreign import _back :: forall a. Int -> Node a -> Effect (Node a)

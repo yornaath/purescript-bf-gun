@@ -10,51 +10,39 @@ exports._create = (opts) => () => {
   return Gun(opts)
 }
 
-exports._opt = (opts) => (gun) => () => gun.opt(opts)
-
-exports._get = (decode) => (encode) => (key) => (gun) => () => {
-  const node = gun.get(key)
-  node._jsonDecode = decode
-  node._jsonEncode = encode
-  return node
+exports._opt = (opts) => (gun) => () => {
+  return gun.opt(opts)
 }
 
-exports._put = (data) => (gun) => () => gun.put(gun._jsonEncode(data))
+exports._get = (key) => (gun) => () => {
+  return gun.get(key)
+}
 
-exports._set = (data) => (gun) => () => gun.set(gun._jsonEncode(data))
+exports._put = (data) => (gun) => () => {
+  return gun.put(data)
+}
 
-exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(gun._jsonEncode(data), null, {opt: { cert }})
+exports._set = (data) => (gun) => () => {
+  return gun.set(data)
+}
+
+exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(data, null, {opt: { cert }})
 
 exports._on = (cb) => (gun) => () => {
   return gun.on((data, key) => {
-    const out = {
-      key,
-      raw: data._,
-      data: gun._jsonDecode(omitSingle("_", data))
-    }
-    cb(out)()
+    return cb(data)()
   })
 }
 
 exports._once = (cb) => (gun) => () => {
   return gun.once((data, key) => {
-    const out = {
-      key,
-      raw: data._,
-      data: gun._jsonDecode(omitSingle("_", data))
-    }
-    cb(out)()
+    return cb(data)()
   })
 }
 
 exports._map = (cb) => (gun) => () => {
   return gun.map((data, key) => {
-    const out = {
-      key,
-      raw: data._,
-      data: gun._jsonDecode(omitSingle("_", data))
-    }
-    cb(out)()
+    return cb(data)()
   })
 }
 

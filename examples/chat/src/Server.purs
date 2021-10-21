@@ -1,14 +1,15 @@
-module Examples.Basic.Server where
+module Examples.Chat.Server where
 
 import Prelude hiding (apply)
 
+import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
+import Debug (trace)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Effect.Timer (setInterval)
-import Examples.Basic.State (stateFromJson, stateToJson)
+import Examples.Chat.State (messageFromJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, fileOption, webOption)
 import Node.Express.App (App, listenHttp, get)
@@ -18,6 +19,11 @@ import Node.HTTP (Server)
 app :: App
 app = get "/" do
   send "body"
+
+
+noop :: forall a. a -> Effect a
+noop a = do
+  pure a
 
 main :: Effect Server
 main = do
@@ -35,12 +41,16 @@ main = do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get "state" gun
-
-  _ <-
-    liftEffect
-      $ setInterval 5 do
-        _ <- statenode # Gun.put { message: "Message from server" }
-        pure unit
+  chatnode <- liftEffect $ 
+    Gun.get "chat" gun >>= \n -> Gun.map noop n
+  
+  _ <- liftEffect $ 
+    chatnode # Gun.on (\d -> do
+      case messageFromJson d.data of 
+        (Left error) -> do 
+          log "error parsing server message error:"
+          pure $ trace error identity
+        (Right state) -> do pure $ trace state identity
+    )
 
   pure server

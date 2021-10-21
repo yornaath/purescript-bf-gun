@@ -23,14 +23,14 @@ main = launchAff_ do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get stateFromJson stateToJson "state" gun
+  statenode <- liftEffect $ Gun.get "state" gun
 
   pure $ trace statenode identity
 
   _ <- do  
     log "listening"
     _ <- liftEffect $ statenode # Gun.on (\d -> do 
-      case d.data of 
+      case stateFromJson d.data of 
         (Left _) -> do log "error parsing server message "
         (Right state) -> do log state.message
     )

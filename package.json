@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "example-basic": "concurrently --kill-others \"node ./examples/basic/server.js\" \"parcel examples/basic/index.html\""
+    "example-basic": "concurrently --kill-others \"node ./examples/basic/server.js\" \"parcel examples/basic/index.html\"",
+    "example-chat": "concurrently --kill-others \"node ./examples/chat/server.js\" \"parcel examples/chat/index.html\""
   },
   "author": "",
   "license": "(GPL-3.0-only OR MIT)",
