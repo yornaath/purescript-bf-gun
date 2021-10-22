@@ -19,7 +19,7 @@ main = do
 
   gun <- Gun.create gunConfig
 
-  messages <- Gun.get "state" gun
+  messages <- Gun.get "messages" gun
   people <- Gun.get "people" gun
 
   _ <- do  

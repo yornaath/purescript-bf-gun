@@ -5,7 +5,6 @@ import Prelude hiding (apply)
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Effect (Effect)
-import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Timer (setInterval)
 import Gun as Gun
@@ -35,13 +34,14 @@ main = do
 
   gun <- Gun.create gunConfig
 
-  messages <- Gun.get "state" gun
-
   alice <- Gun.get "alice" gun
   alicenodeWithData <- alice # Gun.put (SaveableRecord {name : "Alice"})
 
   people <- Gun.get "people" gun
+  
   _ <- people # Gun.set (SaveableNode alicenodeWithData)
+
+  messages <- Gun.get "messages" gun
 
   _ <-
     setInterval 900 do
