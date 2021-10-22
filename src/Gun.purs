@@ -13,9 +13,7 @@ module Gun
   ) where
 
 import Prelude
-
- 
-import Data.Options (Options, options) 
+import Data.Options (Options, options)
 import Effect (Effect)
 import Foreign (Foreign)
 import Gun.Configuration (Configuration)
@@ -44,7 +42,7 @@ put = _put
 
 foreign import _set :: forall a. Saveable a -> Node a -> Effect (Node a)
 
-set :: forall a. Saveable a -> Node a -> Effect (Node a) 
+set :: forall a. Saveable a -> Node a -> Effect (Node a)
 set = _set
 
 foreign import _putWithCertificate :: forall a. Certificate -> Saveable a -> Node a -> Effect (Node a)
@@ -59,7 +57,7 @@ on = _on
 
 foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 
-once :: forall a. (Raw a  -> Effect Unit) -> Node a -> Effect (Node a)
+once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 once = _once
 
 foreign import _map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
