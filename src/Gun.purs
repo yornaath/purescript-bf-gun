@@ -62,7 +62,7 @@ foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (No
 once :: forall a. (Raw a  -> Effect Unit) -> Node a -> Effect (Node a)
 once = _once
 
-foreign import _map :: forall a b. (Saveable a  -> Saveable b) -> Node a -> Effect (Node b)
+foreign import _map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
 
 map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
 map = _map
