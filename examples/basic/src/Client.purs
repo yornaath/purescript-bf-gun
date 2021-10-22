@@ -26,8 +26,8 @@ main = do
   
     log "listening"
 
-    _ <- messages # Gun.on (\state -> do
-      pure $ trace {state} identity
+    _ <- messages # Gun.on (\message -> do
+      pure $ trace {message} identity
     )
 
     mappedPeople <- people # Gun.map identity
