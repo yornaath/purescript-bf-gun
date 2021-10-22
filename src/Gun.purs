@@ -14,12 +14,12 @@ module Gun
 
 import Prelude
 
-import Data.Argonaut (Json)
-import Data.Options (Options, options)
+ 
+import Data.Options (Options, options) 
 import Effect (Effect)
 import Foreign (Foreign)
 import Gun.Configuration (Configuration)
-import Gun.Node (Node, Raw)
+import Gun.Node (Node, Raw, Saveable)
 import Gun.SEA (Certificate)
 
 foreign import _create :: forall a. Foreign -> Effect (Node a)
@@ -37,19 +37,19 @@ foreign import _get :: forall a b. String -> Node a -> Effect (Node b)
 get :: forall a b. String -> Node a -> Effect (Node b)
 get = _get
 
-foreign import _put :: forall a. a -> Node a -> Effect (Node a)
+foreign import _put :: forall a. Saveable a -> Node a -> Effect (Node a)
 
-put :: forall a. a -> Node a -> Effect (Node a)
+put :: forall a. Saveable a -> Node a -> Effect (Node a)
 put = _put
 
-foreign import _set :: forall a. a -> Node a -> Effect (Node a)
+foreign import _set :: forall a. Saveable a -> Node a -> Effect (Node a)
 
-set :: forall a. a -> Node a -> Effect (Node a) 
+set :: forall a. Saveable a -> Node a -> Effect (Node a) 
 set = _set
 
-foreign import _putWithCertificate :: forall a. Certificate -> a -> Node a -> Effect (Node a)
+foreign import _putWithCertificate :: forall a. Certificate -> Saveable a -> Node a -> Effect (Node a)
 
-putWithCertificate :: forall a. Certificate -> a -> Node a -> Effect (Node a)
+putWithCertificate :: forall a. Certificate -> Saveable a -> Node a -> Effect (Node a)
 putWithCertificate = _putWithCertificate
 
 foreign import _on :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
@@ -62,9 +62,9 @@ foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (No
 once :: forall a. (Raw a  -> Effect Unit) -> Node a -> Effect (Node a)
 once = _once
 
-foreign import _map :: forall a b. (Raw a  -> b) -> Node a -> Effect (Node b)
+foreign import _map :: forall a b. (Saveable a  -> Saveable b) -> Node a -> Effect (Node b)
 
-map :: forall a b. (Raw a -> b) -> Node a -> Effect (Node b)
+map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
 map = _map
 
 foreign import _back :: forall a. Int -> Node a -> Effect (Node a)

@@ -19,14 +19,14 @@ exports._get = (key) => (gun) => () => {
 }
 
 exports._put = (data) => (gun) => () => {
-  return gun.put(data)
+  return gun.put(data.value0)
 }
 
 exports._set = (data) => (gun) => () => {
-  return gun.set(data)
+  return gun.set(data.value0)
 }
 
-exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(data, null, {opt: { cert }})
+exports._putWithCertificate = (cert) => (data) => (gun) => () => gun.put(data.value0, null, {opt: { cert }})
 
 exports._on = (cb) => (gun) => () => {
   return gun.on((data, key) => {
@@ -42,7 +42,7 @@ exports._once = (cb) => (gun) => () => {
 
 exports._map = (cb) => (gun) => () => {
   return gun.map((data, key) => {
-    return cb(data)()
+    return cb(data)
   })
 }
 

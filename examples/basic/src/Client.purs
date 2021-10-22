@@ -2,7 +2,6 @@ module Examples.Basic.Client where
 
 import Prelude
 
-import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
@@ -10,7 +9,6 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
-import Examples.Basic.State (stateFromJson, stateToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
 
@@ -23,17 +21,23 @@ main = launchAff_ do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get "state" gun
-
-  pure $ trace statenode identity
+  messages <- liftEffect $ Gun.get "state" gun
+  people <- liftEffect $ Gun.get "people" gun
 
   _ <- do  
+  
     log "listening"
-    _ <- liftEffect $ statenode # Gun.on (\d -> do 
-      case stateFromJson d.data of 
-        (Left _) -> do log "error parsing server message "
-        (Right state) -> do log state.message
+
+    _ <- liftEffect $ messages # Gun.on (\state -> do
+      pure $ trace {state} identity
     )
+
+    mappedPeople <- liftEffect $ people # Gun.map identity
+
+    _ <- liftEffect $ mappedPeople # Gun.on (\person ->
+      pure $ trace {person} identity
+    )
+    
     pure unit
       
 

@@ -12,6 +12,7 @@ import Effect.Console (log)
 import Examples.Chat.State (messageFromJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, fileOption, webOption)
+import Gun.Node (Saveable)
 import Node.Express.App (App, listenHttp, get)
 import Node.Express.Response (send)
 import Node.HTTP (Server)
@@ -21,7 +22,7 @@ app = get "/" do
   send "body"
 
 
-noop :: forall a. a -> Effect a
+noop :: forall a. Row a -> Saveable a
 noop a = do
   pure a
 
@@ -46,6 +47,7 @@ main = do
   
   _ <- liftEffect $ 
     chatnode # Gun.on (\d -> do
+      pure $ trace {d} identity
       case messageFromJson d.data of 
         (Left error) -> do 
           log "error parsing server message error:"

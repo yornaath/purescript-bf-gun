@@ -1,9 +1,9 @@
 module Test.Main where
 
 import Prelude
+
 import Data.Argonaut (Json, JsonDecodeError, decodeJson, encodeJson)
 import Data.Either (Either)
-import Gun.Configuration (Configuration, fileOption, webOption)
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
@@ -12,7 +12,8 @@ import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Timer (setInterval)
 import Gun (create, get, on, put)
-import Gun.User as User
+import Gun.Configuration (Configuration, fileOption, webOption)
+import Gun.Node (Saveable(..))
 
 type RootData
   = { state :: String }
@@ -51,33 +52,33 @@ main =
       liftEffect $ statenode # on \d -> do pure $ trace { stateNode: d } identity
     _ <-
       liftEffect
-        $ setInterval 3000 do
-            _ <- statenode # put { state: "new" }
+        $ setInterval 500 do
+            _ <- statenode # put (SaveableRecord { state: "new" })
             pure unit
 
-    usernode <- liftEffect $ User.user gun
+    -- usernode <- liftEffect $ User.user gun
 
-    bob <- User.createUser "bob" "bobspass" usernode
+    -- bob <- User.createUser "bob" "bobspass" usernode
 
-    authed <- User.auth "bob" "bobspass" usernode
+    -- authed <- User.auth "bob" "bobspass" usernode
 
-    case authed of
-      (User.AuthSuccess auth) -> do
+    -- case authed of
+    --   (User.AuthSuccess auth) -> do
 
-        pure $ trace "logged in" identity
-        userDataNode <- liftEffect $ get "data" usernode
+    --     pure $ trace "logged in" identity
+    --     userDataNode <- liftEffect $ get "data" usernode
 
-        _ <- do
-          liftEffect $ userDataNode # on \d -> do pure $ trace { userNode: d } identity
-        _ <-
-          liftEffect
-            $ setInterval 3000 do
-                _ <- userDataNode # put { secret: "Hysjaass" }
-                pure unit
+    --     _ <- do
+    --       liftEffect $ userDataNode # on \d -> do pure $ trace { userNode: d } identity
+    --     _ <-
+    --       liftEffect
+    --         $ setInterval 3000 do
+    --             let _ = userDataNode # put { secret: "Hysjaass" }
+    --             pure unit
 
-        pure $ trace "exit" identity
+    --     pure $ trace "exit" identity
 
-      (User.AuthError { err }) -> do
-        pure $ trace err identity
+    --   (User.AuthError { err }) -> do
+    --     pure $ trace err identity
     
     pure unit

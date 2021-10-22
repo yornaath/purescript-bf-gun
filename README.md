@@ -21,9 +21,9 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Timer (setInterval)
-import Examples.Basic.State (stateFromJson, stateToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, fileOption, webOption)
+import Gun.Node (Saveable(..))
 import Node.Express.App (App, listenHttp, get)
 import Node.Express.Response (send)
 import Node.HTTP (Server)
@@ -48,17 +48,22 @@ main = do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get stateFromJson stateToJson "state" gun
+  messages <- liftEffect $ Gun.get "state" gun
+
+  alice <- liftEffect $ Gun.get "alice" gun
+  alicenodeWithData <- alice # Gun.put (SaveableRecord {name : "Alice"})
+
+  people <- liftEffect $ Gun.get "people" gun
+  _ <- people # Gun.set (SaveableNode alicenodeWithData)
 
   _ <-
     liftEffect
-      $ setInterval 3000 do
-        log "sending message"
-        _ <- statenode # Gun.put { message: "Message from server" }
+      $ setInterval 900 do
+        log "sending message from server"
+        _ <- messages # Gun.put (SaveableRecord { message: "Message from server" })
         pure unit
 
   pure server
-
 ```
 
 ### Client
@@ -67,7 +72,6 @@ module Examples.Basic.Client where
 
 import Prelude
 
-import Data.Either (Either(..))
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
@@ -75,7 +79,6 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Class.Console (log)
-import Examples.Basic.State (stateFromJson, stateToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
 
@@ -88,17 +91,23 @@ main = launchAff_ do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get stateFromJson stateToJson "state" gun
-
-  pure $ trace statenode identity
+  messages <- liftEffect $ Gun.get "state" gun
+  people <- liftEffect $ Gun.get "people" gun
 
   _ <- do  
+  
     log "listening"
-    _ <- liftEffect $ statenode # Gun.on (\d -> do 
-      case d.data of 
-        (Left _) -> do log "error parsing server message "
-        (Right state) -> do log state.message
+
+    _ <- liftEffect $ messages # Gun.on (\state -> do
+      pure $ trace {state} identity
     )
+
+    mappedPeople <- liftEffect $ people # Gun.map identity
+
+    _ <- liftEffect $ mappedPeople # Gun.on (\person ->
+      pure $ trace {person} identity
+    )
+    
     pure unit
       
 

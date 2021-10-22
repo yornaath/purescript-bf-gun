@@ -29,7 +29,7 @@ to generate this file without the comments in this block.
   , "test-unit"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs", "examples/**/*.purs" ]
+, sources = [ "src/**/*.purs", "test/**/*.purs"]
 , license = "(GPL-3.0-only OR MIT)"
 , repository = "https://github.com/gorillatron/purescript-bf-gun.git"
 }

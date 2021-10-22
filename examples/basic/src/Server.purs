@@ -8,9 +8,9 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
 import Effect.Timer (setInterval)
-import Examples.Basic.State (stateFromJson, stateToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, fileOption, webOption)
+import Gun.Node (Saveable(..))
 import Node.Express.App (App, listenHttp, get)
 import Node.Express.Response (send)
 import Node.HTTP (Server)
@@ -35,12 +35,19 @@ main = do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  statenode <- liftEffect $ Gun.get "state" gun
+  messages <- liftEffect $ Gun.get "state" gun
+
+  alice <- liftEffect $ Gun.get "alice" gun
+  alicenodeWithData <- alice # Gun.put (SaveableRecord {name : "Alice"})
+
+  people <- liftEffect $ Gun.get "people" gun
+  _ <- people # Gun.set (SaveableNode alicenodeWithData)
 
   _ <-
     liftEffect
-      $ setInterval 5 do
-        _ <- statenode # Gun.put { message: "Message from server" }
+      $ setInterval 900 do
+        log "sending message from server"
+        _ <- messages # Gun.put (SaveableRecord { message: "Message from server" })
         pure unit
 
   pure server
