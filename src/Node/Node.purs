@@ -2,11 +2,10 @@ module Gun.Node where
 
 import Data.Argonaut (Json)
 
-data Node a
-  = Node (Raw a)
+type Node = {}
 
 data Saveable a =
-    SaveableNode (Node a)
+    SaveableNode (Node)
   | SaveableRaw (Raw a)
   | SaveableRecord (Record a)
 

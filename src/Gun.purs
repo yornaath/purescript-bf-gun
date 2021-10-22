@@ -2,6 +2,7 @@ module Gun
   ( create
   , opt
   , get
+  , getAt
   , put
   , set
   , putWithCertificate
@@ -13,6 +14,8 @@ module Gun
   ) where
 
 import Prelude
+
+import Data.Array (foldM)
 import Data.Options (Options, options)
 import Effect (Effect)
 import Foreign (Foreign)
@@ -20,57 +23,62 @@ import Gun.Configuration (Configuration)
 import Gun.Node (Node, Raw, Saveable)
 import Gun.SEA (Certificate)
 
-foreign import _create :: forall a. Foreign -> Effect (Node a)
+foreign import _create :: Foreign -> Effect (Node)
 
-create :: forall a. Options Configuration -> Effect (Node a)
+create :: Options Configuration -> Effect (Node)
 create opts = _create (options opts)
 
-foreign import _opt :: forall a. Options Configuration -> Node a -> Effect (Node a)
+foreign import _opt :: Options Configuration -> Node -> Effect (Node)
 
-opt :: forall a. Options Configuration -> Node a -> Effect (Node a)
+opt ::  Options Configuration -> Node -> Effect (Node)
 opt = _opt
 
-foreign import _get :: forall a b. String -> Node a -> Effect (Node b)
+foreign import _get :: String -> Node -> Effect (Node)
 
-get :: forall a b. String -> Node a -> Effect (Node b)
+get :: String -> Node -> Effect (Node)
 get = _get
 
-foreign import _put :: forall a. Saveable a -> Node a -> Effect (Node a)
+getAt :: Array String -> Node -> Effect (Node)
+getAt paths node = foldM getNext node paths 
+  where
+    getNext acc nextPath = get nextPath acc
+  
+foreign import _put :: forall a. Saveable a -> Node -> Effect (Node)
 
-put :: forall a. Saveable a -> Node a -> Effect (Node a)
+put :: forall a. Saveable a -> Node -> Effect (Node)
 put = _put
 
-foreign import _set :: forall a. Saveable a -> Node a -> Effect (Node a)
+foreign import _set :: forall a. Saveable a -> Node -> Effect (Node)
 
-set :: forall a. Saveable a -> Node a -> Effect (Node a)
+set :: forall a. Saveable a -> Node -> Effect (Node)
 set = _set
 
-foreign import _putWithCertificate :: forall a. Certificate -> Saveable a -> Node a -> Effect (Node a)
+foreign import _putWithCertificate :: forall a. Certificate -> Saveable a -> Node -> Effect (Node)
 
-putWithCertificate :: forall a. Certificate -> Saveable a -> Node a -> Effect (Node a)
+putWithCertificate :: forall a. Certificate -> Saveable a -> Node -> Effect (Node)
 putWithCertificate = _putWithCertificate
 
-foreign import _on :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
+foreign import _on :: forall a. (Raw a -> Effect Unit) -> Node -> Effect (Node)
 
-on :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
+on :: forall a. (Raw a -> Effect Unit) -> Node -> Effect (Node)
 on = _on
 
-foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
+foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node -> Effect (Node)
 
-once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
+once :: forall a. (Raw a -> Effect Unit) -> Node -> Effect (Node)
 once = _once
 
-foreign import _map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
+foreign import _map :: forall a b. (Saveable a -> Saveable b) -> Node -> Effect (Node)
 
-map :: forall a b. (Saveable a -> Saveable b) -> Node a -> Effect (Node b)
+map :: forall a b. (Saveable a -> Saveable b) -> Node -> Effect (Node)
 map = _map
 
-foreign import _back :: forall a. Int -> Node a -> Effect (Node a)
+foreign import _back :: Int -> Node -> Effect (Node)
 
-back :: forall a. Int -> Node a -> Effect (Node a)
+back :: Int -> Node -> Effect (Node)
 back = _back
 
-foreign import _off :: forall a. Node a -> Effect Unit
+foreign import _off :: Node -> Effect Unit
 
-off :: forall a. Node a -> Effect Unit
+off :: Node -> Effect Unit
 off = _off

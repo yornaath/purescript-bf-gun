@@ -11,7 +11,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Timer (setInterval)
-import Gun (create, get, on, put)
+import Gun (create, get, getAt, on, put)
 import Gun.Configuration (Configuration, fileOption, webOption)
 import Gun.Node (Saveable(..))
 
@@ -46,10 +46,10 @@ main =
 
     gun <- liftEffect $ (create gunConfig)
 
-    statenode <- liftEffect $ get "state" gun
+    statenode <- liftEffect $ getAt ["state", "foo", "bar"] gun
 
     _ <- do
-      liftEffect $ statenode # on \d -> do pure $ trace { stateNode: d } identity
+      liftEffect $ statenode # on \d -> do pure $ trace { state: d } identity
     _ <-
       liftEffect
         $ setInterval 500 do
