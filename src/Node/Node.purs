@@ -1,12 +1,7 @@
 module Gun.Node where
 
-import Prelude
-
 import Data.Argonaut (Json)
-import Record as Record
-import Type.Proxy (Proxy(..))
 
---data Node :: Row Type -> Type
 data Node a
   = Node (Raw a)
 
