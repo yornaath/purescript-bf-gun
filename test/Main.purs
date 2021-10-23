@@ -11,7 +11,7 @@ import Effect (Effect)
 import Effect.Aff (launchAff_)
 import Effect.Class (liftEffect)
 import Effect.Timer (setInterval)
-import Gun (create, get, getAt, on, put)
+import Gun (create, getAt, on, put)
 import Gun.Configuration (Configuration, fileOption, webOption)
 import Gun.Node (Saveable(..))
 

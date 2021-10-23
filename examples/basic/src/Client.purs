@@ -19,20 +19,20 @@ main = do
 
   gun <- Gun.create gunConfig
 
-  messages <- Gun.get "messages" gun
-  people <- Gun.get "people" gun
+  let messages = Gun.get "messages" gun
+  let people = Gun.get "people" gun
 
   _ <- do  
   
     log "listening"
 
-    _ <- messages # Gun.on (\message -> do
+    let _ = messages # Gun.on \message -> do
       pure $ trace {message} identity
-    )
+    
 
-    mappedPeople <- people # Gun.map identity
+    let mappedPeople = people # Gun.map identity
 
-    _ <- mappedPeople # Gun.on (\person ->
+    let __ = mappedPeople # Gun.on (\person ->
       pure $ trace {person} identity
     )
     
