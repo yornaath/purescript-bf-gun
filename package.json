@@ -12,6 +12,7 @@
   "license": "(GPL-3.0-only OR MIT)",
   "dependencies": {
     "gun": "^0.2020.1235",
+    "lodash.clone": "^4.5.0",
     "lodash.omit": "^4.5.0"
   },
   "devDependencies": {

@@ -2,25 +2,28 @@ module Gun
   ( create
   , opt
   , get
-  , getAt
   , put
   , set
   , putWithCertificate
   , on
   , once
+  , onceExec
   , map
   , back
   , off
+  , toJSON
   ) where
 
 import Prelude
 
-import Data.Array (foldM)
+import Data.Argonaut (Json)
+import Data.Maybe (Maybe)
 import Data.Options (Options, options)
 import Effect (Effect)
 import Foreign (Foreign)
 import Gun.Configuration (Configuration)
-import Gun.Node (Node, Raw, Saveable)
+import Gun.Node (Cursor, Node, Raw, Saveable)
+import Gun.Query.Mapper (Mapper(..))
 import Gun.SEA (Certificate)
 
 foreign import _create ::forall a. Foreign -> Effect (Node a)
@@ -33,16 +36,11 @@ foreign import _opt :: forall a. Options Configuration -> Node a -> Effect (Node
 opt :: forall a. Options Configuration -> Node a -> Effect (Node a)
 opt = _opt
 
-foreign import _get :: forall a. String -> Node a -> Effect (Node a)
+foreign import _get :: forall a b. String -> Node a -> Effect (Node b)
 
-get :: forall a. String -> Node a -> Effect (Node a)
+get :: forall a b. String -> Node a -> Effect (Node b)
 get = _get
 
-getAt :: forall a. Array String -> Node a -> Effect (Node a)
-getAt paths node = foldM getNext node paths 
-  where
-    getNext acc nextPath = get nextPath acc
-  
 foreign import _put :: forall a. Saveable a -> Node a -> Effect (Node a)
 
 put :: forall a. Saveable a -> Node a -> Effect (Node a)
@@ -65,13 +63,21 @@ on = _on
 
 foreign import _once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
 
-once :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
-once = _once
+once :: forall a. Node a -> Effect (Node a)
+once = _once \ns -> pure unit
 
-foreign import _map :: forall a b. (Raw a -> Record b) -> Node a -> Effect (Node b) 
+onceExec :: forall a. (Raw a -> Effect Unit) -> Node a -> Effect (Node a)
+onceExec = _once
 
-map :: forall a b. (Raw a -> Record b) -> Node a -> Effect (Node b)
+foreign import _map :: forall a b. (Mapper a) -> Node a -> Effect (Node b) 
+
+map :: forall a b. (Mapper a) -> Node a -> Effect (Node b)
 map = _map
+
+foreign import _toJSON :: forall a. Raw a -> Effect Json
+
+toJSON :: forall a. Raw a -> Effect Json
+toJSON = _toJSON
 
 foreign import _back :: forall a. Int -> Node a -> Effect (Node a)
 

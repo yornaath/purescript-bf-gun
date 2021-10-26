@@ -1,4 +1,6 @@
 const Gun = require("gun")
+const clone = require("lodash.clone")
+const omit = require("lodash.omit")
 
 const omitSingle = (key, obj) => {
   const out = obj
@@ -42,10 +44,23 @@ exports._once = (cb) => (gun) => () => {
 
 exports._map = (cb) => (gun) => () => {
   return gun.map((data, key) => {
-    return cb(data)
+    return typeof cb && cb.value0 == "function" ? cb.value0(data)() : data
   })
 }
 
 exports._back = (steps) => (gun) => () => gun.back(steps)
 
 exports._off = (gun) => () => gun.off()
+
+const getDataFromRaw = (raw) => {
+  return omit(clone(raw), ["_"])
+}
+
+exports._toJSON = (nodeOrRawOrRecord) => () => {
+  if(nodeOrRawOrRecord && nodeOrRawOrRecord.put) {
+    return getDataFromRaw(nodeOrRawOrRecord.put)
+  }
+  else {
+    return getDataFromRaw(nodeOrRawOrRecord)
+  }
+}

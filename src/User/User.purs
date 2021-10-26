@@ -19,7 +19,7 @@ import Prelude
 import Control.Promise (Promise, toAffE)
 import Effect (Effect)
 import Effect.Aff (Aff)
-import Gun.Node (Node)
+import Gun.Node(Node)
 
 data CreateAck
   = CreatedSuccess CreatedSuccessPayload
@@ -44,37 +44,37 @@ type AuthErrorPayload
 type DeleteSuccessPayload
   = { ok :: Int }
 
-foreign import _user :: Node -> Effect (Node)
+foreign import _user :: forall a. Node a -> Effect (Node a)
 
-user ::  Node -> Effect (Node)
+user :: forall a.  Node a -> Effect (Node a)
 user = _user
 
-foreign import _userAt :: String -> Node -> Effect (Node)
+foreign import _userAt :: forall a. String -> Node a -> Effect (Node a)
 
-userAt :: String -> Node -> Effect (Node)
+userAt :: forall a. String -> Node a -> Effect (Node a)
 userAt = _userAt
 
-foreign import _createUser ::  (CreatedErrorPayload -> CreateAck) -> (CreatedSuccessPayload -> CreateAck) -> String -> String -> Node -> Effect (Promise CreateAck)
+foreign import _createUser :: forall a.  (CreatedErrorPayload -> CreateAck) -> (CreatedSuccessPayload -> CreateAck) -> String -> String -> Node a -> Effect (Promise CreateAck)
 
-createUser :: String -> String -> Node -> Aff CreateAck
-createUser alias pass node = toAffE $ _createUser CreatedError CreatedSuccess alias pass node
+createUser :: forall a. String -> String -> Node a -> Aff CreateAck
+createUser alias pass node a = toAffE $ _createUser CreatedError CreatedSuccess alias pass node
 
-foreign import _auth ::  (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> String -> String -> Node -> Effect (Promise AuthAck)
+foreign import _auth :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> String -> String -> Node a -> Effect (Promise AuthAck)
 
-auth :: String -> String -> Node -> Aff AuthAck
-auth alias pass node = toAffE $ _auth AuthError AuthSuccess alias pass node
+auth :: forall a. String -> String -> Node a -> Aff AuthAck
+auth alias pass node a = toAffE $ _auth AuthError AuthSuccess alias pass node
 
-foreign import _recall ::  (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> Node -> Effect (Promise AuthAck)
+foreign import _recall :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> Node a -> Effect (Promise AuthAck)
 
-recall :: Node -> Aff AuthAck
-recall node = toAffE $ _recall AuthError AuthSuccess node
+recall :: forall a. Node a -> Aff AuthAck
+recall node a = toAffE $ _recall AuthError AuthSuccess node
 
-foreign import _leave ::  Node -> Effect (Node)
+foreign import _leave :: forall a.  Node a -> Effect (Node a)
 
-leave ::  Node -> Effect (Node)
+leave :: forall a. Node a -> Effect (Node a)
 leave = _leave
 
-foreign import _delete ::  String -> String -> Node -> Effect (Promise DeleteSuccessPayload)
+foreign import _delete :: forall a. String -> String -> Node a -> Effect (Promise DeleteSuccessPayload)
 
-delete :: String -> String -> Node -> Aff DeleteSuccessPayload
+delete :: forall a. String -> String -> Node a -> Aff DeleteSuccessPayload
 delete alias pass node = toAffE $ _delete alias pass node

@@ -2,72 +2,78 @@ module Gun.Query where
 
 import Prelude
 
-import Control.Monad.Free (Free, liftF)
-import Data.Argonaut (Json, JsonDecodeError(..), decodeJson)
-import Data.Array (cons, foldM, snoc)
-import Data.Bifunctor (class Bifunctor, bimap)
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..))
+import Data.List (List(..), snoc)
 import Effect (Effect)
-import Gun.Node (Cursor, Node)
+import Gun as Gun
+import Gun.Node (Node, Raw, Saveable)
+import Gun.Query.Mapper (Mapper)
 
 data QueryOperator a
-  = From (Array String) 
-  | Map (Maybe Cursor) 
-  | Once 
+  = From String
+  | Map (Mapper a) 
+  | Once
   | OnceExec (Exec a)
   | On (Exec a)
 
-type Exec a = (Either JsonDecodeError a -> Effect Unit)
+type Exec a = Raw a -> Effect Unit
 
--- type Operator
---   = Free OperatorF
-
--- from :: Array String -> Operator Unit
--- from str = liftF (From str unit)
-
--- map :: Cursor -> Operator Unit
--- map cursor = liftF (Map cursor unit)
-
--- once :: Operator Unit
--- once = liftF (Once unit)
-
-type Query a = Array (QueryOperator a)
+type Query a = List (QueryOperator a)
 
 emptyQuery :: forall a. Query a
-emptyQuery = []
+emptyQuery = Nil
 
-from :: forall a . Array String -> Query a -> Query a
-from path query = snoc query (From path)
+from :: forall a . String -> Query a -> Query a
+from path query' = snoc query' (From path)
 
-map :: forall a. Maybe Cursor -> Query a -> Query a
-map filter query = snoc query (Map filter)
+map :: forall a. Mapper a -> Query a -> Query a
+map filter query' = snoc query' (Map filter)
 
 once :: forall a. Query a -> Query a
-once query = snoc query (Once)
+once query' = snoc query' (Once)
 
 onceExec :: forall a. Exec a -> Query a -> Query a
-onceExec exec query = snoc query (OnceExec exec)
+onceExec exec query' = snoc query' (OnceExec exec)
 
 on :: forall a. Exec a -> Query a -> Query a
-on exec query = snoc query (On exec)
+on exec query' = snoc query' (On exec)
 
-q :: forall a. Array (QueryOperator a)
-q = emptyQuery # 
-    from ["user", "data"] # 
-    map Nothing # 
-    once # 
-    on \d -> do 
-      pure unit
+query :: forall a. Query a -> Node a -> Effect (Node a)
+query (Cons nextQuery tail) node = do 
+  push <- case nextQuery of 
+    From path -> do Gun.get path node
+    Map mapper -> do Gun.map mapper node
+    Once -> do Gun.once node
+    OnceExec cb -> Gun.onceExec cb node
+    On cb -> Gun.on cb node
+  query tail push
+query Nil node = do pure node
 
-type QueryOperation a = Tuple (Node a) (QueryOperator (Record a))
+-- query :: forall a. Query a -> Effect (Node a) -> Effect (Node a)
+-- query q node = query' q 
+--   where
+--   query' :: forall a. QueryOperator a -> Query a -> Effect (Node a)
+--   query'
+-- type QueryOperation a = Tuple (Effect (Node a)) (QueryOperator (Record a))
 
-combine :: forall a. QueryOperator (Record a) -> Node a -> QueryOperation a
-combine query node = Tuple node query
+-- combine :: forall a. QueryOperator (Record a) -> Node a -> QueryOperation a
+-- combine query node = Tuple (pure node) query
 
-perform :: forall a b. QueryOperation a -> QueryOperation b
-perform operation = bimap
+-- perform :: forall a. QueryOperation a -> QueryOperation a
+-- perform operation@(Tuple node query) = bimap (\n -> do
+--   o <- n
+--   case query of 
+--     From path -> do Gun.getAt path o
+--     Map filter -> do Gun.map filter o
+--     Once -> do Gun.once o
+--     OnceExec cb -> Gun.onceExec cb o
+--     _ -> pure o
+-- ) identity operation
+
+-- (\n -> 
+--   case query of 
+--     Once -> Gun.once n
+--     _ -> pure n
+-- )
 
 --runQuery :: forall a. Query (Record a) -> Node a -> Effect (Either JsonDecodeError (Record a))
 -- runQuery query node = do 
