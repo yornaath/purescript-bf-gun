@@ -12,7 +12,8 @@ import Effect.Console (log)
 import Examples.Chat.State (messageFromJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, fileOption, webOption)
-import Gun.Node (Saveable)
+import Gun.Node (Saveable(..), getData)
+import Gun.Query.Mapper (Mapper(..))
 import Node.Express.App (App, listenHttp, get)
 import Node.Express.Response (send)
 import Node.HTTP (Server)
@@ -20,11 +21,6 @@ import Node.HTTP (Server)
 app :: App
 app = get "/" do
   send "body"
-
-
-noop :: forall a. Row a -> Saveable a
-noop a = do
-  pure a
 
 main :: Effect Server
 main = do
@@ -42,17 +38,16 @@ main = do
 
   gun <- liftEffect $ (Gun.create gunConfig)
 
-  chatnode <- liftEffect $ 
-    Gun.get "chat" gun >>= \n -> Gun.map noop n
+  chatnode <- Gun.get "chat" gun >>= \n -> Gun.map Passthrough n
   
   _ <- liftEffect $ 
-    chatnode # Gun.on (\d -> do
-      pure $ trace {d} identity
-      case messageFromJson d.data of 
+    chatnode # Gun.on (\raw -> do
+      let message = getData (SaveableRaw raw)
+      case messageFromJson message of 
         (Left error) -> do 
           log "error parsing server message error:"
           pure $ trace error identity
-        (Right state) -> do pure $ trace state identity
+        (Right state) -> do pure $ trace {state} identity
     )
 
   pure server

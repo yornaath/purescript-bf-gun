@@ -5,17 +5,21 @@ import Prelude
 import Control.Coroutine as CR
 import Control.Coroutine.Aff (emit)
 import Control.Coroutine.Aff as CRA
+import Data.Either (Either(..))
 import Data.JSDate (now, toString)
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
+import Debug (trace)
 import Effect (Effect)
 import Effect.Aff (Aff)
+import Effect.Class.Console (log)
 import Examples.Chat.Client.Components.Chat (Message(..))
 import Examples.Chat.Client.Components.Chat as Chat
 import Examples.Chat.State (messageFromJson, messageToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
-import Gun.Node (Node)
+import Gun.Node (Node, Saveable(..), getData)
+import Gun.Query.Mapper (Mapper(..))
 import Halogen (liftEffect)
 import Halogen as H
 import Halogen.Aff as HA
@@ -23,9 +27,19 @@ import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
 
 -- A producer coroutine that emits messages that arrive from the websocket.
-gunProducer :: Node Unit -> CR.Producer String Aff Unit
+gunProducer :: Node () -> CR.Producer String Aff Unit
 gunProducer socket = CRA.produce \emitter -> do
-  emit emitter mempty
+  chat <- Gun.map Passthrough socket
+  _ <- chat # Gun.on (\raw -> do
+    let message = getData (SaveableRaw raw)
+    case messageFromJson message of 
+      (Left error) -> do 
+        log "error parsing server message error:"
+        pure $ trace error identity
+      (Right message') -> do 
+        emit emitter message'.text
+  )
+  pure unit
 
 -- A consumer coroutine that takes the `query` function from our component IO
 -- record and sends `ReceiveMessage` queries in when it receives inputs from the
@@ -37,13 +51,13 @@ gunConsumer query = CR.consumer \msg -> do
 
 -- A handler for messages from our component IO that sends them to the server
 -- using the websocket
-gunSender :: Node Unit -> Chat.Message -> Effect Unit
+gunSender :: Node () -> Chat.Message -> Effect Unit
 gunSender chatnode message = do
   case message of 
     OutputMessage message' -> do
       date <- now
       messagenode <- Gun.get (toString date) chatnode
-      _ <- Gun.put { text: message' } messagenode
+      _ <- Gun.put (SaveableRecord { text: message' }) messagenode
       pure unit
 
 main :: Effect Unit
