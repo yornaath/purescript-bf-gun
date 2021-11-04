@@ -19,17 +19,23 @@ to generate this file without the comments in this block.
   , "console"
   , "debug"
   , "effect"
+  , "either"
   , "express"
+  , "foreign"
   , "foreign-generic"
   , "halogen"
+  , "js-timers"
+  , "lists"
+  , "maybe"
   , "node-http"
   , "options"
   , "prelude"
   , "psci-support"
+  , "record"
   , "test-unit"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs"]
+, sources = [ "src/**/*.purs", "test/**/*.purs" ]
 , license = "(GPL-3.0-only OR MIT)"
 , repository = "https://github.com/gorillatron/purescript-bf-gun.git"
 }

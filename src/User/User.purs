@@ -57,17 +57,17 @@ userAt = _userAt
 foreign import _createUser :: forall a.  (CreatedErrorPayload -> CreateAck) -> (CreatedSuccessPayload -> CreateAck) -> String -> String -> Node a -> Effect (Promise CreateAck)
 
 createUser :: forall a. String -> String -> Node a -> Aff CreateAck
-createUser alias pass node a = toAffE $ _createUser CreatedError CreatedSuccess alias pass node
+createUser alias pass node = toAffE $ _createUser CreatedError CreatedSuccess alias pass node
 
 foreign import _auth :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> String -> String -> Node a -> Effect (Promise AuthAck)
 
 auth :: forall a. String -> String -> Node a -> Aff AuthAck
-auth alias pass node a = toAffE $ _auth AuthError AuthSuccess alias pass node
+auth alias pass node = toAffE $ _auth AuthError AuthSuccess alias pass node
 
 foreign import _recall :: forall a. (AuthErrorPayload -> AuthAck) -> (AuthSuccessPayload -> AuthAck) -> Node a -> Effect (Promise AuthAck)
 
 recall :: forall a. Node a -> Aff AuthAck
-recall node a = toAffE $ _recall AuthError AuthSuccess node
+recall node = toAffE $ _recall AuthError AuthSuccess node
 
 foreign import _leave :: forall a.  Node a -> Effect (Node a)
 

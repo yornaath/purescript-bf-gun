@@ -43,10 +43,10 @@ main = do
 
   messages <- Gun.get "messages" gun
 
-  -- _ <-
-  --   setInterval 900 do
-  --     log "sending message from server"
-  --     _ <- messages # Gun.put (SaveableRecord { message: "Message from server" })
-  --     pure unit
+  _ <-
+    setInterval 900 do
+      log "sending message from server"
+      _ <- messages # Gun.put (SaveableRecord { message: "Message from server" })
+      pure unit
 
   pure server

@@ -9,6 +9,7 @@ import Effect (Effect)
 import Effect.Class.Console (log)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
+import Gun.Query.Mapper (Mapper(..))
 
 main :: Effect Unit
 main = do
@@ -19,21 +20,19 @@ main = do
 
   gun <- Gun.create gunConfig
 
-  let messages = Gun.get "messages" gun
-  let people = Gun.get "people" gun
+  messages <- Gun.get "messages" gun
+  people <- Gun.get "people" gun
 
   _ <- do  
   
     log "listening"
 
-    let _ = messages # Gun.on \message -> do
-      pure $ trace {message} identity
+    _ <- messages # Gun.on \message -> do pure $ trace {message} identity
     
-
-    let mappedPeople = people # Gun.map identity
+    mappedPeople <- people # Gun.map Passthrough
 
     let __ = mappedPeople # Gun.on (\person ->
-      pure $ trace {person} identity
+                                      pure $ trace {person} identity
     )
     
     pure unit
