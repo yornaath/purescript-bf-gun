@@ -1,7 +1,7 @@
 
-exports._user = (gun) => () => gun.user()
+exports._user = (gun) => gun.user()
 
-exports._userAt = (path) => (gun) => () => gun.user(path)
+exports._userAt = (path) => (gun) => gun.user(path)
 
 exports._auth = (ErrorType) => (Successtype) => (alias) => (pass) => (usernode) => () => new Promise((resolve) => {
   usernode.auth(alias, pass, (data) => {

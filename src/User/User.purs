@@ -44,14 +44,14 @@ type AuthErrorPayload
 type DeleteSuccessPayload
   = { ok :: Int }
 
-foreign import _user :: forall a. Node a -> Effect (Node a)
+foreign import _user :: forall a. Node a -> Node a
 
-user :: forall a.  Node a -> Effect (Node a)
+user :: forall a.  Node a -> Node a
 user = _user
 
-foreign import _userAt :: forall a. String -> Node a -> Effect (Node a)
+foreign import _userAt :: forall a. String -> Node a -> Node a
 
-userAt :: forall a. String -> Node a -> Effect (Node a)
+userAt :: forall a. String -> Node a -> Node a
 userAt = _userAt
 
 foreign import _createUser :: forall a.  (CreatedErrorPayload -> CreateAck) -> (CreatedSuccessPayload -> CreateAck) -> String -> String -> Node a -> Effect (Promise CreateAck)
