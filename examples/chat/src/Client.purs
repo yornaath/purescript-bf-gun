@@ -15,7 +15,7 @@ import Effect.Aff (Aff)
 import Effect.Class.Console (log)
 import Examples.Chat.Client.Components.Chat (Message(..))
 import Examples.Chat.Client.Components.Chat as Chat
-import Examples.Chat.State (messageFromJson, messageToJson)
+import Examples.Chat.State (DatedMessage, serverMessageFromJson, serverMessageToJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
 import Gun.Node (Node, Saveable(..), getData)
@@ -27,24 +27,25 @@ import Halogen.Subscription as HS
 import Halogen.VDom.Driver (runUI)
 
 -- A producer coroutine that emits messages that arrive from the websocket.
-gunProducer :: Node () -> CR.Producer String Aff Unit
+gunProducer :: Node () -> CR.Producer DatedMessage Aff Unit
 gunProducer socket = CRA.produce \emitter -> do
-  chat <- Gun.map Passthrough socket
-  _ <- chat # Gun.on (\raw -> do
-    let message = getData (SaveableRaw raw)
-    case messageFromJson message of 
-      (Left error) -> do 
-        log "error parsing server message error:"
-        pure $ trace error identity
-      (Right message') -> do 
-        emit emitter message'.text
+  let chat = Gun.map Passthrough socket
+  let _ = chat # Gun.on (\key raw -> do
+                            let message = getData (SaveableRaw raw)
+                            case serverMessageFromJson message of 
+                              (Left error) -> do 
+                                log "error parsing server message error:"
+                                pure $ trace error identity
+                              (Right message') -> do
+                                log key
+                                emit emitter { text: message'.text, date: key }
   )
   pure unit
 
 -- A consumer coroutine that takes the `query` function from our component IO
 -- record and sends `ReceiveMessage` queries in when it receives inputs from the
 -- producer.
-gunConsumer :: (forall a. Chat.Query a -> Aff (Maybe a)) -> CR.Consumer String Aff Unit
+gunConsumer :: (forall a. Chat.Query a -> Aff (Maybe a)) -> CR.Consumer DatedMessage Aff Unit
 gunConsumer query = CR.consumer \msg -> do
   void $ query $ H.mkTell $ Chat.ReceiveMessage msg
   pure Nothing
@@ -54,10 +55,9 @@ gunConsumer query = CR.consumer \msg -> do
 gunSender :: Node () -> Chat.Message -> Effect Unit
 gunSender chatnode message = do
   case message of 
-    OutputMessage message' -> do
-      date <- now
-      messagenode <- Gun.get (toString date) chatnode
-      _ <- Gun.put (SaveableRecord { text: message' }) messagenode
+    OutputMessage message' -> do 
+      let messagenode = Gun.get message'.date chatnode
+      let _ = Gun.put (SaveableRecord { text: message'.text }) messagenode
       pure unit
 
 main :: Effect Unit
@@ -68,9 +68,9 @@ main = do
     gunConfig =
       peersOption := Just ["http://localhost:8080/gun"]
 
-  gun <- liftEffect $ (Gun.create gunConfig)
+  let gun = Gun.create gunConfig
 
-  chatnode <- Gun.get "chat" gun
+  let chatnode = Gun.get "chat" gun
 
   HA.runHalogenAff do
     body <- HA.awaitBody

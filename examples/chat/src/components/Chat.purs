@@ -3,8 +3,12 @@ module Examples.Chat.Client.Components.Chat where
 import Prelude
 
 import Data.Array as A
+import Data.JSDate (now, toString)
+import Data.Map as M
 import Data.Maybe (Maybe(..))
-import Effect.Class (class MonadEffect)
+import Data.Tuple (Tuple(..), fst, snd)
+import Effect.Class (class MonadEffect, liftEffect)
+import Examples.Chat.State (DatedMessage)
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
@@ -14,20 +18,20 @@ import Web.Event.Event as Event
 
 type Slot = H.Slot Query Message
 
-data Query a = ReceiveMessage String a
+data Query a = ReceiveMessage DatedMessage a
 
-data Message = OutputMessage String
+data Message = OutputMessage DatedMessage
 
 data Action
   = HandleInput String
   | Submit Event
 
-type State =
-  { messages :: Array String
+type State = 
+  { messages :: M.Map String String
   , inputText :: String
   }
 
-component :: forall i m. MonadEffect m => H.Component Query i Message m
+component :: forall i m. MonadEffect m => H.Component Query i Message m 
 component =
   H.mkComponent
     { initialState
@@ -39,13 +43,17 @@ component =
     }
 
 initialState :: forall i. i -> State
-initialState _ = { messages: [], inputText: "" }
+initialState _ = { messages: M.fromFoldable [], inputText: "" }
+
+sortMessages :: M.Map String String -> Array String
+sortMessages messages = M.toUnfoldable messages # A.sortBy (\a b -> if fst a > fst b then GT else LT ) # map snd
 
 render :: forall m. State -> H.ComponentHTML Action () m
 render state =
   HH.form
     [ HE.onSubmit Submit ]
-    [ HH.ol_ $ map (\msg -> HH.li_ [ HH.text msg ]) state.messages
+    [ HH.ol_ $ map (\msg -> HH.li_ [ HH.text msg ]) $ sortMessages state.messages
+    , HH.text "test"
     , HH.input
         [ HP.type_ HP.InputText
         , HP.value (state.inputText)
@@ -62,17 +70,13 @@ handleAction = case _ of
     H.modify_ (_ { inputText = text })
   Submit ev -> do
     H.liftEffect $ Event.preventDefault ev
+    date <- liftEffect now
     st <- H.get
-    let outgoingMessage = st.inputText
+    let outgoingMessage = {text: st.inputText, date: (toString date)}
     H.raise $ OutputMessage outgoingMessage
-    H.modify_ \st' -> st'
-      { messages = st'.messages `A.snoc` ("Sending: " <> outgoingMessage)
-      , inputText = ""
-      }
 
 handleQuery :: forall m a. Query a -> H.HalogenM State Action () Message m (Maybe a)
 handleQuery = case _ of
   ReceiveMessage msg a -> do
-    let incomingMessage = "Received: " <> msg
-    H.modify_ \st -> st { messages = st.messages `A.snoc` incomingMessage }
+    H.modify_ \st -> st { messages = M.insert msg.date msg.text st.messages }
     pure (Just a)

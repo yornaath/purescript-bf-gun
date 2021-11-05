@@ -3,12 +3,17 @@ module Examples.Chat.State where
 import Data.Argonaut (Json, JsonDecodeError, decodeJson, encodeJson)
 import Data.Either (Either)
  
-type Message = {
+type ServerMessage = {
   text :: String
 }
 
-messageToJson :: Message -> Json
-messageToJson = encodeJson
+type DatedMessage = {
+  text :: String,
+  date :: String
+}
 
-messageFromJson :: Json -> Either JsonDecodeError Message
-messageFromJson = decodeJson
+serverMessageToJson :: ServerMessage -> Json
+serverMessageToJson = encodeJson
+
+serverMessageFromJson :: Json -> Either JsonDecodeError ServerMessage
+serverMessageFromJson = decodeJson 

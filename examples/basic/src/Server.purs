@@ -32,21 +32,21 @@ main = do
         <> fileOption
         := Just "radata"
 
-  gun <- Gun.create gunConfig
+  let gun = Gun.create gunConfig
 
-  alice <- Gun.get "alice" gun
-  alicenodeWithData <- alice # Gun.put (SaveableRecord {name : "Alice"})
+  let alice = Gun.get "alice" gun
+  let alicenodeWithData = alice # Gun.put (SaveableRecord {name : "Alice"})
 
-  people <- Gun.get "people" gun
+  let people = Gun.get "people" gun
   
-  _ <- people # Gun.set (SaveableNode alicenodeWithData)
+  let _ = people # Gun.set (SaveableNode alicenodeWithData)
 
-  messages <- Gun.get "messages" gun
+  let messages = Gun.get "messages" gun
 
   _ <-
     setInterval 900 do
       log "sending message from server"
-      _ <- messages # Gun.put (SaveableRecord { message: "Message from server" })
+      let _ = messages # Gun.put (SaveableRecord { message: "Message from server" })
       pure unit
 
   pure server

@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "example-basic": "rm -rf ./radata && concurrently --kill-others \"node ./examples/basic/server.js\" \"parcel examples/basic/index.html\"",
-    "example-chat": "rm -rf ./radata && concurrently --kill-others \"node ./examples/chat/server.js\" \"parcel examples/chat/index.html\""
+    "test": "echo \"Error: no test specified\" && exit 1", 
+    "example-basic": "rm -rf ./radata && rm -rf .parcel-cache/ && concurrently --kill-others \"node ./examples/basic/server.js\" \"parcel examples/basic/index.html\"",
+    "example-chat": "rm -rf ./radata && rm -rf .parcel-cache/ && concurrently --kill-others \"node ./examples/chat/server.js\" \"parcel examples/chat/index.html\""
   },
   "author": "",
   "license": "(GPL-3.0-only OR MIT)",

@@ -9,10 +9,10 @@ import Debug (trace)
 import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Console (log)
-import Examples.Chat.State (messageFromJson)
+import Examples.Chat.State (serverMessageFromJson)
 import Gun as Gun
-import Gun.Configuration (Configuration, fileOption, webOption)
-import Gun.Node (Saveable(..), getData)
+import Gun.Configuration (Configuration, fileOption, peersOption, webOption)
+import Gun.Node (Raw, Saveable(..), Node, getData)
 import Gun.Query.Mapper (Mapper(..))
 import Node.Express.App (App, listenHttp, get)
 import Node.Express.Response (send)
@@ -22,7 +22,7 @@ app :: App
 app = get "/" do
   send "body"
 
-main :: Effect Server
+main :: Effect Server 
 main = do
 
   server <-
@@ -32,22 +32,23 @@ main = do
   let
     gunConfig :: Options Configuration
     gunConfig =
-      webOption := Just server
-        <> fileOption
-        := Just "radata"
+      webOption := Just server <> 
+      fileOption := Just "radata"
 
-  gun <- liftEffect $ (Gun.create gunConfig)
+  let gun = Gun.create gunConfig
 
-  chatnode <- Gun.get "chat" gun >>= \n -> Gun.map Passthrough n
+  let chatnode = gun # Gun.get "chat" # Gun.map Passthrough
   
-  _ <- liftEffect $ 
-    chatnode # Gun.on (\raw -> do
+  let 
+    onMessage :: String -> Raw (text :: String) -> Effect Unit
+    onMessage key raw = do
       let message = getData (SaveableRaw raw)
-      case messageFromJson message of 
+      case serverMessageFromJson message of 
         (Left error) -> do 
           log "error parsing server message error:"
           pure $ trace error identity
-        (Right state) -> do pure $ trace {state} identity
-    )
+        (Right state) -> do pure $ trace {state, key} identity
+
+  let _ = chatnode # Gun.on onMessage
 
   pure server

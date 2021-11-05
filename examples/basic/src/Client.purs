@@ -18,21 +18,23 @@ main = do
     gunConfig =
       peersOption := Just ["http://localhost:8080/gun"]
 
-  gun <- Gun.create gunConfig
+  let gun = Gun.create gunConfig
 
-  messages <- Gun.get "messages" gun
-  people <- Gun.get "people" gun
+  let messages = Gun.get "messages" gun
+  let people = Gun.get "people" gun
 
   _ <- do  
   
     log "listening"
 
-    _ <- messages # Gun.on \message -> do pure $ trace {message} identity
+    let _ = messages # Gun.on (\key message ->
+      pure $ trace {message} identity
+    )
     
-    mappedPeople <- people # Gun.map Passthrough
+    let mappedPeople = people # Gun.map Passthrough
 
-    let __ = mappedPeople # Gun.on (\person ->
-                                      pure $ trace {person} identity
+    let _ = mappedPeople # Gun.on (\key person ->
+      pure $ trace {person} identity
     )
     
     pure unit

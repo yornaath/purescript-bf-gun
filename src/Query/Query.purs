@@ -8,45 +8,45 @@ import Gun as Gun
 import Gun.Node (Node, Raw, Saveable)
 import Gun.Query.Mapper (Mapper)
 
-data QueryOperator a
-  = From String
-  | Map (Mapper a) 
-  | Once
-  | OnceExec (Exec a)
-  | On (Exec a)
+-- data QueryOperator a
+--   = From String
+--   | Map (Mapper a) 
+--   | Once
+--   | OnceExec (Exec a)
+--   | On (Exec a)
 
-type Exec a = Raw a -> Effect Unit
+-- type Exec a = Raw a -> Effect Unit
 
-type Query a = List (QueryOperator a)
+-- type Query a = List (QueryOperator a)
 
-emptyQuery :: forall a. Query a
-emptyQuery = Nil
+-- emptyQuery :: forall a. Query a
+-- emptyQuery = Nil
 
-from :: forall a . String -> Query a -> Query a
-from path query' = snoc query' (From path)
+-- from :: forall a . String -> Query a -> Query a
+-- from path query' = snoc query' (From path)
 
-map :: forall a. Mapper a -> Query a -> Query a
-map filter query' = snoc query' (Map filter)
+-- map :: forall a. Mapper a -> Query a -> Query a
+-- map filter query' = snoc query' (Map filter)
 
-once :: forall a. Query a -> Query a
-once query' = snoc query' (Once)
+-- once :: forall a. Query a -> Query a
+-- once query' = snoc query' (Once)
 
-onceExec :: forall a. Exec a -> Query a -> Query a
-onceExec exec query' = snoc query' (OnceExec exec)
+-- onceExec :: forall a. Exec a -> Query a -> Query a
+-- onceExec exec query' = snoc query' (OnceExec exec)
 
-on :: forall a. Exec a -> Query a -> Query a
-on exec query' = snoc query' (On exec)
+-- on :: forall a. Exec a -> Query a -> Query a
+-- on exec query' = snoc query' (On exec)
 
-query :: forall a. Query a -> Node a -> Effect (Node a)
-query (Cons nextQuery tail) node = do 
-  push <- case nextQuery of 
-    From path -> do Gun.get path node
-    Map mapper -> do Gun.map mapper node
-    Once -> do Gun.once node
-    OnceExec cb -> Gun.onceExec cb node
-    On cb -> Gun.on cb node
-  query tail push
-query Nil node = do pure node
+-- query :: forall a. Query a -> Node a -> Node a
+-- query (Cons nextQuery tail) node = do 
+--   let push = case nextQuery of 
+--     From path -> do Gun.get path node
+--     Map mapper -> do Gun.map mapper node
+--     Once -> do Gun.once node
+--     OnceExec cb -> Gun.onceExec cb node
+--     On cb -> Gun.on cb node
+--   query tail push
+-- query Nil node = do pure node
 
 -- query :: forall a. Query a -> Effect (Node a) -> Effect (Node a)
 -- query q node = query' q 
