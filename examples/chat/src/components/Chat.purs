@@ -6,7 +6,7 @@ import Data.Array as A
 import Data.JSDate (now, toString)
 import Data.Map as M
 import Data.Maybe (Maybe(..))
-import Data.Tuple (Tuple(..), fst, snd)
+import Data.Tuple (fst, snd)
 import Effect.Class (class MonadEffect, liftEffect)
 import Examples.Chat.State (DatedMessage)
 import Halogen as H

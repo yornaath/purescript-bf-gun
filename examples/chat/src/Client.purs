@@ -6,7 +6,6 @@ import Control.Coroutine as CR
 import Control.Coroutine.Aff (emit)
 import Control.Coroutine.Aff as CRA
 import Data.Either (Either(..))
-import Data.JSDate (now, toString)
 import Data.Maybe (Maybe(..))
 import Data.Options (Options, (:=))
 import Debug (trace)
@@ -15,12 +14,11 @@ import Effect.Aff (Aff)
 import Effect.Class.Console (log)
 import Examples.Chat.Client.Components.Chat (Message(..))
 import Examples.Chat.Client.Components.Chat as Chat
-import Examples.Chat.State (DatedMessage, serverMessageFromJson, serverMessageToJson)
+import Examples.Chat.State (DatedMessage, serverMessageFromJson)
 import Gun as Gun
 import Gun.Configuration (Configuration, peersOption)
 import Gun.Node (Node, Saveable(..), getData)
 import Gun.Query.Mapper (Mapper(..))
-import Halogen (liftEffect)
 import Halogen as H
 import Halogen.Aff as HA
 import Halogen.Subscription as HS
